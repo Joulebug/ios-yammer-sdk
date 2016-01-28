@@ -114,6 +114,7 @@ NSString * const YMBaseURL = @"https://www.yammer.com";
     NSLog(@"GET %@", path);
     [self.sessionManager GET:path
                   parameters:parameters
+                    progress:nil
                      success:^(NSURLSessionDataTask *dataTask, id responseObject) {
                          success(responseObject);
                      }
@@ -130,6 +131,7 @@ NSString * const YMBaseURL = @"https://www.yammer.com";
     NSLog(@"POST %@", path);
     [self.sessionManager POST:path
                    parameters:parameters
+                     progress:nil
                       success:^(NSURLSessionDataTask *dataTask, id responseObject) {
                           success(responseObject);
                       }
