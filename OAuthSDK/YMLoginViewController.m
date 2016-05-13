@@ -89,7 +89,7 @@ const NSInteger YMFrameLoadInterruptedError = 102;
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel
                                                                                            target:self
                                                                                            action:@selector(cancel)];
-    
+    _webView.scalesPageToFit = YES;
     [self.webView loadRequest:self.request];
 }
 
@@ -171,6 +171,31 @@ const NSInteger YMFrameLoadInterruptedError = 102;
     if (error.code != YMFrameLoadInterruptedError) {
         if ([self.delegate respondsToSelector:@selector(loginViewController:didFailWithError:)]) {
             [self.delegate loginViewController:self didFailWithError:error];
+        }
+    }
+}
+
+- (void) webViewDidFinishLoad:(UIWebView *)webView
+{
+    
+    if([webView.request.URL.absoluteString containsString:@"yammer.com/dialog/authenticate"]) {
+        
+        //Fix Yammer Login page not sizing correctly.
+        //Login form appears to be about 455 wide
+        CGFloat loginFormWidth = 455;
+        CGFloat screenWidth = webView.frame.size.width;
+        
+        CGFloat zoomFactor = screenWidth/loginFormWidth;
+        
+        if(zoomFactor < 1.0){
+            
+            NSString* js = [NSString stringWithFormat:
+                            @"var meta = document.createElement('meta'); " \
+                            "meta.setAttribute( 'name', 'viewport' ); " \
+                            "meta.setAttribute( 'content', 'width = device-width, initial-scale = %f, user-scalable=yes' ); " \
+                            "document.getElementsByTagName('head')[0].appendChild(meta)",zoomFactor];
+            
+            [webView stringByEvaluatingJavaScriptFromString: js];
         }
     }
 }
